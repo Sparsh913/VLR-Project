@@ -33,9 +33,9 @@ def extract_data(path_dataset):
         img_array = np.load(output_path + img)
         # img_array = np.squeeze(img_array)
         print("shape after loading: ", img_array.shape)
-        if img.startswith("rgb"):
+        # if img.startswith("rgb"):
             # img_array = np.transpose(img_array, (2, 0, 1))
-            img_array = np.full((img_array.shape[0], img_array.shape[1], 3), 255, dtype=np.uint8)
+            # img_array = np.full((img_array.shape[0], img_array.shape[1], 3), 255, dtype=np.uint8)
         #     print("shape after transpose: ", img_array.shape)
             
         # img_array = img_array * 255
@@ -43,7 +43,7 @@ def extract_data(path_dataset):
         # img_array = (img_array - np.min(img_array)) / (np.max(img_array) - np.min(img_array))
         # print("shape after normalization: ", img_array.shape)
         # img_array = np.uint8(img_array)
-        print("shape after uint8: ", img_array.shape)
+        # print("shape after uint8: ", img_array.shape)
         if img.startswith("rgb"):
             img_array = Image.fromarray(img_array, mode='RGB')
         else:
