@@ -7,7 +7,8 @@ def extract_data(path_dataset):
     # find .npz files in path_dataset through regex and store it in a list. the episodes name are in this format: episode_0358482.npz
     episodes = [epi for epi in os.listdir(path_dataset) if re.match(r'episode_[0-9]+.npz', epi)]
     print("Num of episodes: ", len(episodes))
-    epi = episodes[500]
+    epi = episodes[510]
+    # epi = "episode_0360950.npz"
     # print(type(episodes))
     # Load the first episode
     data = np.load(path_dataset + epi)

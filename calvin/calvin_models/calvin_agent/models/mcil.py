@@ -12,6 +12,8 @@ from pytorch_lightning.utilities import rank_zero_only
 import torch
 import torch.distributions as D
 
+from calvin_agent.models.perceptual_encoders.clip import CLIP, CLIP_
+
 logger = logging.getLogger(__name__)
 
 
@@ -78,6 +80,8 @@ class MCIL(pl.LightningModule, CalvinBaseModel):
         self.latent_goal = None
         self.plan = None
         self.lang_embeddings = None
+        
+        self.clip = CLIP_()
 
     @staticmethod
     def setup_input_sizes(
@@ -263,6 +267,17 @@ class MCIL(pl.LightningModule, CalvinBaseModel):
             perceptual_emb = self.perceptual_encoder(
                 dataset_batch["rgb_obs"], dataset_batch["depth_obs"], dataset_batch["robot_obs"]
             )
+            print('mcil perceptual emb shape', perceptual_emb.shape)
+            # print('dataset_batch["rgb_obs"]["rgb_static"]', dataset_batch["rgb_obs"]['rgb_static'].shape)
+            print("type of dataset_batch['rgb_obs']", type(dataset_batch["rgb_obs"])) # It's a dict
+            print("type of dataset_batch['rgb_obs']['rgb_static']", type(dataset_batch["rgb_obs"]['rgb_static'])) # It's a tensor
+            print("size of dataset_batch['rgb_obs']['rgb_static']", dataset_batch["rgb_obs"]['rgb_static'].shape) # It's a tensor
+            # dataset_batch["rgb_obs"]['rgb_static'] -> batchsize, sequence_length, 3, 200, 200
+            # batchsize, sequence_length, 3, 200, 200 -> batchsize*sequence_length, 3, 200, 200
+            clip_input = dataset_batch["rgb_obs"]['rgb_static'].view(dataset_batch["rgb_obs"]['rgb_static'].shape[0]*dataset_batch["rgb_obs"]["rgb_static"].shape[1], 3, 200, 200)
+            perceptual_emb = self.clip(clip_input)
+            perceptual_emb = perceptual_emb.view(dataset_batch["rgb_obs"]['rgb_static'].shape[0], dataset_batch["rgb_obs"]['rgb_static'].shape[1], -1)
+            print('clip perceptual emb shape', perceptual_emb.shape)
             if "lang" in self.modality_scope:
                 latent_goal = self.language_goal(dataset_batch["lang"])
             else:
